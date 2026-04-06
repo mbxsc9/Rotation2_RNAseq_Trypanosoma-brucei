@@ -1,0 +1,33 @@
+#!/bin/bash
+#SBATCH --partition=defq
+#SBATCH --nodes=1
+#SBATCH --ntasks=1
+#SBATCH --cpus-per-task=5
+#SBATCH --mem=100g
+#SBATCH --time=24:00:00
+#SBATCH --job-name=Fast_qc_blood
+#SBATCH --output=/gpfs01/share/BioinfMSc/life4136_2526/rotation2/group4/Scripts/Logs/slurm-%x-%j.out
+#SBATCH --error=/gpfs01/share/BioinfMSc/life4136_2526/rotation2/group4/Scripts/Logs/slurm-%x-%j.err
+#SBATCH --mail-type=ALL
+#SBATCH --mail-user=mbxjr7@nottingham.ac.uk
+
+#Activates the conda environment
+source $HOME/.bash_profile
+conda activate rotation2
+
+#Loads the fastqc module
+module load fastqc
+
+#Defines input and output paths
+BLOOD=/gpfs01/share/BioinfMSc/life4136_2526/rotation2/group4/blood/Blood*.fastq.gz
+OUTDIR=/gpfs01/share/BioinfMSc/life4136_2526/rotation2/group4/fastqc/blood
+
+#Creates/checks output directory
+mkdir -p "$OUTDIR"
+
+#Runs fastqc on blood samples
+fastqc $BLOOD -o $OUTDIR
+
+#Deactivates the conda environment
+conda deactivate
+
