@@ -1,0 +1,58 @@
+#!/bin/bash
+#SBATCH --partition=defq
+#SBATCH --nodes=1
+#SBATCH --ntasks=1
+#SBATCH --cpus-per-task=8
+#SBATCH --mem=100g
+#SBATCH --time=4:00:00
+#SBATCH --job-name=htseq
+#SBATCH --output=/gpfs01/share/BioinfMSc/life4136_2526/rotation2/group4/Scripts/Logs/slurm-%x-%j.out
+#SBATCH --error=/gpfs01/share/BioinfMSc/life4136_2526/rotation2/group4/Scripts/Logs/slurm-%x-%j.err
+#SBATCH --mail-type=ALL
+#SBATCH --mail-user=mbxsc9@nottingham.ac.uk
+
+#Activates the conda environment
+source $HOME/.bash_profile
+conda activate rotation2
+
+#Setting paths for the files
+INPUT_DIR="/share/BioinfMSc/life4136_2526/rotation2/group4/mapping_bowtie2/bam_files/blood-bam"
+OUTPUT_DIR="/share/BioinfMSc/life4136_2526/rotation2/group4/htseq/blood"
+GFF_FILE="/share/BioinfMSc/life4136_2526/rotation2/group4/reference_files/TriTrypDB-68_TbruceiTREU927.gff"
+
+mkdir -p "$OUTPUT_DIR"
+
+#parameters for counting
+FEATURE_TYPE="exon"
+GENE_ATTR="Parent"
+STRANDED="yes"
+BAM_ORDER="pos"
+
+#using bam files from the mentioned directory and not any subdirectories
+mapfile -t BAMS < <(find "$INPUT_DIR" -maxdepth 1 -type f -name "*.bam" | sort)
+
+#to catch any errors/failures
+if [[ ${#BAMS[@]} -eq 0 ]]; then
+  echo "No BAM files found in $INPUT_DIR" >&2
+  exit 1
+fi
+
+for BAM in "${BAMS[@]}"
+   do
+   BASENAME="$(basename "$BAM" .bam)"
+   OUT_FILE="${OUTPUT_DIR}/${BASENAME}.counts.txt"
+
+  htseq-count \
+    -f bam \
+    -r "$BAM_ORDER" \
+    -s "$STRANDED" \
+    -t "$FEATURE_TYPE" \
+    -i "$GENE_ATTR" \
+    --mode union \
+     "$BAM" "$GFF_FILE" > "$OUT_FILE"
+done
+
+conda deactivate
+
+
+
