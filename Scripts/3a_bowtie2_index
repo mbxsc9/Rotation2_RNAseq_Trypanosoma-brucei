@@ -1,0 +1,23 @@
+#!/bin/bash
+#SBATCH --partition=defq
+#SBATCH --nodes=1
+#SBATCH --ntasks=1
+#SBATCH --cpus-per-task=8
+#SBATCH --mem=100g
+#SBATCH --time=2:00:00
+#SBATCH --job-name=bowtie-index
+#SBATCH --output=/gpfs01/share/BioinfMSc/life4136_2526/rotation2/group4/Scripts/Logs/slurm-%x-%j.out
+#SBATCH --error=/gpfs01/share/BioinfMSc/life4136_2526/rotation2/group4/Scripts/Logs/slurm-%x-%j.err
+#SBATCH --mail-type=ALL
+#SBATCH --mail-user=mbxas28@nottingham.ac.uk
+
+#Activates the conda environment
+source $HOME/.bash_profile
+conda activate rotation2
+
+bowtie2-build \
+/share/BioinfMSc/life4136_2526/rotation2/group4/reference_files/TriTrypDB-68_TbruceiTREU927_Genome.fasta \
+/share/BioinfMSc/life4136_2526/rotation2/group4/reference_files/index
+
+conda deactivate
+
