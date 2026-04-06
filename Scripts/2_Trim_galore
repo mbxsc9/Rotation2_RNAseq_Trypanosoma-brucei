@@ -1,0 +1,24 @@
+#!/bin/bash
+#SBATCH --partition=defq
+#SBATCH --nodes=1
+#SBATCH --ntasks=1
+#SBATCH --cpus-per-task=8
+#SBATCH --mem=100g
+#SBATCH --time=24:00:00
+#SBATCH --job-name=trim_galore
+#SBATCH --output=/gpfs01/share/BioinfMSc/life4136_2526/rotation2/group4/Scripts/Logs/slurm-%x-%j.out
+#SBATCH --error=/gpfs01/share/BioinfMSc/life4136_2526/rotation2/group4/Scripts/Logs/slurm-%x-%j.err
+#SBATCH --mail-type=ALL
+#SBATCH --mail-user=mbxsc9@nottingham.ac.uk
+
+#Activates the conda environment
+source $HOME/.bash_profile
+conda activate rotation2
+
+## input file
+trim_galore --phred33 --a G{20} --fastqc \
+/share/BioinfMSc/life4136_2526/rotation2/group4/blood/Blood* \
+-o /share/BioinfMSc/life4136_2526/rotation2/group4/trim-galore/blood_33
+
+conda deactivate
+
